@@ -1,0 +1,212 @@
+=== PYTEST EXECUTION LOG ===
+
+Exit Code: 1
+
+STDOUT:
+============================= test session starts ==============================
+platform linux -- Python 3.11.15, pytest-9.0.2, pluggy-1.6.0 -- /tmp/test_venv_exec_bk5p5ii9/venv/bin/python
+cachedir: .pytest_cache
+metadata: {'Python': '3.11.15', 'Platform': 'Linux-5.15.0-1102-azure-x86_64-with-glibc2.41', 'Packages': {'pytest': '9.0.2', 'pluggy': '1.6.0'}, 'Plugins': {'asyncio': '1.3.0', 'anyio': '4.13.0', 'json-report': '1.5.0', 'metadata': '3.1.1'}}
+rootdir: /tmp/test_venv_exec_bk5p5ii9
+configfile: pytest.ini
+plugins: asyncio-1.3.0, anyio-4.13.0, json-report-1.5.0, metadata-3.1.1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 7 items
+
+test_agent.py::test_classify_attendance_present_functional FAILED        [ 14%]
+test_agent.py::test_classify_attendance_present_functional_db_unavailable FAILED [ 28%]
+test_agent.py::test_classify_attendance_present_functional_malformed_input[malformed_payload0] FAILED [ 42%]
+test_agent.py::test_classify_attendance_present_functional_malformed_input[malformed_payload1] FAILED [ 57%]
+test_agent.py::test_classify_attendance_present_functional_malformed_input[malformed_payload2] FAILED [ 71%]
+test_agent.py::test_classify_attendance_present_functional_malformed_input[malformed_payload3] FAILED [ 85%]
+test_agent.py::test_classify_attendance_present_functional_malformed_input[malformed_payload4] FAILED [100%]
+
+=================================== FAILURES ===================================
+_________________ test_classify_attendance_present_functional __________________
+
+client = <starlette.testclient.TestClient object at 0x7f2fd57a3950>
+valid_attendance_input = {'checkin_time': '09:00', 'date': '2024-06-01', 'employee_id': 'E001', 'holiday_status': 'None', ...}
+
+    def test_classify_attendance_present_functional(client, valid_attendance_input):
+        """
+        Functional test: Validates that the /classify endpoint correctly classifies an employee as Present
+        when check-in is on time, no leave, and not a holiday.
+        """
+        # Patch any database calls within the endpoint to avoid real DB access
+        with patch("attendance_app.get_db_session") as mock_db:
+            mock_db.return_value = MagicMock()
+            response = client.post("/classify", json=valid_attendance_input)
+>       assert response.status_code == 200, "Expected HTTP 200 for valid input"
+E       AssertionError: Expected HTTP 200 for valid input
+E       assert 404 == 200
+E        +  where 404 = <Response [404 Not Found]>.status_code
+
+test_agent.py:46: AssertionError
+__________ test_classify_attendance_present_functional_db_unavailable __________
+
+client = <starlette.testclient.TestClient object at 0x7f2fd57a3950>
+valid_attendance_input = {'checkin_time': '09:00', 'date': '2024-06-01', 'employee_id': 'E001', 'holiday_status': 'None', ...}
+
+    def test_classify_attendance_present_functional_db_unavailable(client, valid_attendance_input):
+        """
+        Functional test: Simulates database unavailable scenario for /classify endpoint.
+        """
+        # Simulate DB connection error
+        with patch("attendance_app.get_db_session", side_effect=Exception("DB unavailable")):
+            response = client.post("/classify", json=valid_attendance_input)
+        # Depending on implementation, could be 500 or custom error code
+>       assert response.status_code in (500, 503), "Expected HTTP 500 or 503 when DB is unavailable"
+E       AssertionError: Expected HTTP 500 or 503 when DB is unavailable
+E       assert 404 in (500, 503)
+E        +  where 404 = <Response [404 Not Found]>.status_code
+
+test_agent.py:60: AssertionError
+_ test_classify_attendance_present_functional_malformed_input[malformed_payload0] _
+
+client = <starlette.testclient.TestClient object at 0x7f2fd57a3950>
+malformed_payload = {}
+
+    @pytest.mark.parametrize(
+        "malformed_payload",
+        [
+            {},  # Completely empty
+            {"employee_id": "E001"},  # Missing required fields
+            {"employee_id": "E001", "checkin_time": "09:00"},  # Partially missing
+            {"employee_id": None, "checkin_time": "09:00", "shift_start": "09:00", "leave_status": "None", "holiday_status": "None", "date": "2024-06-01"},  # Null employee_id
+            {"employee_id": "E001", "checkin_time": "not-a-time", "shift_start": "09:00", "leave_status": "None", "holiday_status": "None", "date": "2024-06-01"},  # Invalid time format
+        ]
+    )
+    def test_classify_attendance_present_functional_malformed_input(client, malformed_payload):
+        """
+        Functional test: Simulates malformed input data for /classify endpoint.
+        """
+        response = client.post("/classify", json=malformed_payload)
+        # FastAPI returns 422 for validation errors
+>       assert response.status_code == 422, "Expected HTTP 422 for malformed input"
+E       AssertionError: Expected HTTP 422 for malformed input
+E       assert 404 == 422
+E        +  where 404 = <Response [404 Not Found]>.status_code
+
+test_agent.py:80: AssertionError
+_ test_classify_attendance_present_functional_malformed_input[malformed_payload1] _
+
+client = <starlette.testclient.TestClient object at 0x7f2fd57a3950>
+malformed_payload = {'employee_id': 'E001'}
+
+    @pytest.mark.parametrize(
+        "malformed_payload",
+        [
+            {},  # Completely empty
+            {"employee_id": "E001"},  # Missing required fields
+            {"employee_id": "E001", "checkin_time": "09:00"},  # Partially missing
+            {"employee_id": None, "checkin_time": "09:00", "shift_start": "09:00", "leave_status": "None", "holiday_status": "None", "date": "2024-06-01"},  # Null employee_id
+            {"employee_id": "E001", "checkin_time": "not-a-time", "shift_start": "09:00", "leave_status": "None", "holiday_status": "None", "date": "2024-06-01"},  # Invalid time format
+        ]
+    )
+    def test_classify_attendance_present_functional_malformed_input(client, malformed_payload):
+        """
+        Functional test: Simulates malformed input data for /classify endpoint.
+        """
+        response = client.post("/classify", json=malformed_payload)
+        # FastAPI returns 422 for validation errors
+>       assert response.status_code == 422, "Expected HTTP 422 for malformed input"
+E       AssertionError: Expected HTTP 422 for malformed input
+E       assert 404 == 422
+E        +  where 404 = <Response [404 Not Found]>.status_code
+
+test_agent.py:80: AssertionError
+_ test_classify_attendance_present_functional_malformed_input[malformed_payload2] _
+
+client = <starlette.testclient.TestClient object at 0x7f2fd57a3950>
+malformed_payload = {'checkin_time': '09:00', 'employee_id': 'E001'}
+
+    @pytest.mark.parametrize(
+        "malformed_payload",
+        [
+            {},  # Completely empty
+            {"employee_id": "E001"},  # Missing required fields
+            {"employee_id": "E001", "checkin_time": "09:00"},  # Partially missing
+            {"employee_id": None, "checkin_time": "09:00", "shift_start": "09:00", "leave_status": "None", "holiday_status": "None", "date": "2024-06-01"},  # Null employee_id
+            {"employee_id": "E001", "checkin_time": "not-a-time", "shift_start": "09:00", "leave_status": "None", "holiday_status": "None", "date": "2024-06-01"},  # Invalid time format
+        ]
+    )
+    def test_classify_attendance_present_functional_malformed_input(client, malformed_payload):
+        """
+        Functional test: Simulates malformed input data for /classify endpoint.
+        """
+        response = client.post("/classify", json=malformed_payload)
+        # FastAPI returns 422 for validation errors
+>       assert response.status_code == 422, "Expected HTTP 422 for malformed input"
+E       AssertionError: Expected HTTP 422 for malformed input
+E       assert 404 == 422
+E        +  where 404 = <Response [404 Not Found]>.status_code
+
+test_agent.py:80: AssertionError
+_ test_classify_attendance_present_functional_malformed_input[malformed_payload3] _
+
+client = <starlette.testclient.TestClient object at 0x7f2fd57a3950>
+malformed_payload = {'checkin_time': '09:00', 'date': '2024-06-01', 'employee_id': None, 'holiday_status': 'None', ...}
+
+    @pytest.mark.parametrize(
+        "malformed_payload",
+        [
+            {},  # Completely empty
+            {"employee_id": "E001"},  # Missing required fields
+            {"employee_id": "E001", "checkin_time": "09:00"},  # Partially missing
+            {"employee_id": None, "checkin_time": "09:00", "shift_start": "09:00", "leave_status": "None", "holiday_status": "None", "date": "2024-06-01"},  # Null employee_id
+            {"employee_id": "E001", "checkin_time": "not-a-time", "shift_start": "09:00", "leave_status": "None", "holiday_status": "None", "date": "2024-06-01"},  # Invalid time format
+        ]
+    )
+    def test_classify_attendance_present_functional_malformed_input(client, malformed_payload):
+        """
+        Functional test: Simulates malformed input data for /classify endpoint.
+        """
+        response = client.post("/classify", json=malformed_payload)
+        # FastAPI returns 422 for validation errors
+>       assert response.status_code == 422, "Expected HTTP 422 for malformed input"
+E       AssertionError: Expected HTTP 422 for malformed input
+E       assert 404 == 422
+E        +  where 404 = <Response [404 Not Found]>.status_code
+
+test_agent.py:80: AssertionError
+_ test_classify_attendance_present_functional_malformed_input[malformed_payload4] _
+
+client = <starlette.testclient.TestClient object at 0x7f2fd57a3950>
+malformed_payload = {'checkin_time': 'not-a-time', 'date': '2024-06-01', 'employee_id': 'E001', 'holiday_status': 'None', ...}
+
+    @pytest.mark.parametrize(
+        "malformed_payload",
+        [
+            {},  # Completely empty
+            {"employee_id": "E001"},  # Missing required fields
+            {"employee_id": "E001", "checkin_time": "09:00"},  # Partially missing
+            {"employee_id": None, "checkin_time": "09:00", "shift_start": "09:00", "leave_status": "None", "holiday_status": "None", "date": "2024-06-01"},  # Null employee_id
+            {"employee_id": "E001", "checkin_time": "not-a-time", "shift_start": "09:00", "leave_status": "None", "holiday_status": "None", "date": "2024-06-01"},  # Invalid time format
+        ]
+    )
+    def test_classify_attendance_present_functional_malformed_input(client, malformed_payload):
+        """
+        Functional test: Simulates malformed input data for /classify endpoint.
+        """
+        response = client.post("/classify", json=malformed_payload)
+        # FastAPI returns 422 for validation errors
+>       assert response.status_code == 422, "Expected HTTP 422 for malformed input"
+E       AssertionError: Expected HTTP 422 for malformed input
+E       assert 404 == 422
+E        +  where 404 = <Response [404 Not Found]>.status_code
+
+test_agent.py:80: AssertionError
+--------------------------------- JSON report ----------------------------------
+report saved to: /tmp/test_venv_exec_bk5p5ii9/pytest_report.json
+=========================== short test summary info ============================
+FAILED test_agent.py::test_classify_attendance_present_functional - Assertion...
+FAILED test_agent.py::test_classify_attendance_present_functional_db_unavailable
+FAILED test_agent.py::test_classify_attendance_present_functional_malformed_input[malformed_payload0]
+FAILED test_agent.py::test_classify_attendance_present_functional_malformed_input[malformed_payload1]
+FAILED test_agent.py::test_classify_attendance_present_functional_malformed_input[malformed_payload2]
+FAILED test_agent.py::test_classify_attendance_present_functional_malformed_input[malformed_payload3]
+FAILED test_agent.py::test_classify_attendance_present_functional_malformed_input[malformed_payload4]
+============================== 7 failed in 0.40s ===============================
+
+
+STDERR:
