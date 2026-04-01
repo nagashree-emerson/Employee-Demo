@@ -1,0 +1,17 @@
+
+openai>=2.6.0
+anthropic
+python-dotenv
+pydantic
+aiohttp>=3.11.0
+rich
+fastapi
+uvicorn
+requests
+httpx
+numpy
+pandas
+cryptography
+
+azure-ai-contentsafety>=1.0.0
+azure-core>=1.30.0
