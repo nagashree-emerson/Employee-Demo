@@ -1,0 +1,17 @@
+{
+  "name": "classify_attendance_late_present_functional",
+  "description": "Checks that the endpoint classifies as Late Present when check-in is within grace period after shift start.",
+  "test_type": "functional",
+  "input": "POST /classify with AttendanceInput: employee_id='emp2', checkin_time='09:08', shift_start='09:00', grace_period=10, leave_status='None', holiday_status='None', date='2024-06-01'",
+  "output": "AttendanceOutput with success=True, attendance_status='Late Present', message containing 'Late Present'",
+  "success_criteria": [
+    "HTTP status code is 200",
+    "response.success is True",
+    "response.attendance_status is 'Late Present'",
+    "response.message contains 'Late Present'"
+  ],
+  "error_scenarios": [
+    "Database unavailable",
+    "Unexpected server error"
+  ]
+}
