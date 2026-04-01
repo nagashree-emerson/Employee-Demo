@@ -1,0 +1,16 @@
+{
+  "name": "classify_attendance_missing_required_fields_functional",
+  "description": "Checks that the /classify endpoint returns an error when required fields are missing.",
+  "test_type": "functional",
+  "input": "POST /classify with AttendanceInput missing employee_id and shift_start",
+  "output": "AttendanceOutput with success=False, error_type='ValidationError', error_description mentioning missing required fields",
+  "success_criteria": [
+    "HTTP status code is 422",
+    "response.success is False",
+    "response.error_type == 'ValidationError'",
+    "response.error_description contains 'employee_id' and/or 'shift_start'"
+  ],
+  "error_scenarios": [
+    "Malformed input data"
+  ]
+}
