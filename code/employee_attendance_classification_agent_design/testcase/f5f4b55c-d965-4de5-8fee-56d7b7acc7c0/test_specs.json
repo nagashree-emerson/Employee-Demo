@@ -1,0 +1,17 @@
+{
+  "name": "classify_attendance_holiday_functional",
+  "description": "Ensures that the endpoint returns Holiday status when holiday_status is True.",
+  "test_type": "functional",
+  "input": "POST /classify with AttendanceInput: employee_id='emp5', checkin_time=null, shift_start='09:00', leave_status='None', holiday_status='True', date='2024-06-01'",
+  "output": "AttendanceOutput with success=True, attendance_status='Holiday', message containing 'Holiday'",
+  "success_criteria": [
+    "HTTP status code is 200",
+    "response.success is True",
+    "response.attendance_status is 'Holiday'",
+    "response.message contains 'Holiday'"
+  ],
+  "error_scenarios": [
+    "Database unavailable",
+    "Unexpected server error"
+  ]
+}
