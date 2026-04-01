@@ -1,0 +1,15 @@
+{
+  "name": "health_check_endpoint_functional",
+  "description": "Checks that the /health endpoint returns a healthy status.",
+  "test_type": "functional",
+  "input": "GET /health",
+  "output": "JSON response with success=True and status='ok'",
+  "success_criteria": [
+    "HTTP status code is 200",
+    "response.success is True",
+    "response.status is 'ok'"
+  ],
+  "error_scenarios": [
+    "Unexpected server error"
+  ]
+}
