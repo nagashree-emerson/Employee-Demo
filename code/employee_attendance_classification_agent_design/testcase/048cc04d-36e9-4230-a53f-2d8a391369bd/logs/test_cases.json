@@ -1,0 +1,11 @@
+[
+  {
+    "id": "test_1",
+    "name": "classify_attendance_present_functional",
+    "description": "Test: classify_attendance_present_functional",
+    "type": "functional",
+    "status": "failed",
+    "duration": 0.0,
+    "error": "client = <starlette.testclient.TestClient object at 0x7f2fd57a3950>\nvalid_attendance_input = {'checkin_time': '09:00', 'date': '2024-06-01', 'employee_id': 'E001', 'holiday_status': 'None', ...}\n\n    def test_classify_attendance_present_functional(client, valid_attendance_input):\n        \"\"\"\n        Functional test: Validates that the /classify endpoint correctly classifies an employee as Present\n        when check-in is on time, no leave, and not a holiday.\n        \"\"\"\n        # Patch any database calls within the endpoint to avoid real DB access\n        with patch(\"attendance_app.get_db_session\") as mock_db:\n            mock_db.return_value = MagicMock()\n            response = client.post(\"/classify\", json=valid_attendance_input)\n>       assert response.status_code == 200, \"Expected HTTP 200 for valid input\"\nE       AssertionError: Expected HTTP 200 for valid input\nE       assert 404 == 200\nE        +  where 404 = <Response [404 Not Found]>.status_code\n\ntest_agent.py:46: AssertionError"
+  }
+]
