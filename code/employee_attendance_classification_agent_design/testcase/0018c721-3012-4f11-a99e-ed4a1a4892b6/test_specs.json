@@ -1,0 +1,18 @@
+{
+  "name": "classify_attendance_invalid_time_format_functional",
+  "description": "Checks that the endpoint returns a proper error when checkin_time is in an invalid format.",
+  "test_type": "functional",
+  "input": "POST /classify with AttendanceInput: employee_id='emp4', checkin_time='invalid_time', shift_start='09:00', leave_status='None', holiday_status='None', date='2024-06-01'",
+  "output": "AttendanceOutput with success=False, error_type indicating validation or value error, error_description mentioning invalid time format",
+  "success_criteria": [
+    "HTTP status code is 200 or 422",
+    "response.success is False",
+    "response.error_type is not None",
+    "response.error_description contains 'Invalid time format'"
+  ],
+  "error_scenarios": [
+    "ValidationError",
+    "HTTPException",
+    "Unexpected server error"
+  ]
+}
